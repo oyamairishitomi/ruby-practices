@@ -31,3 +31,4 @@ puts '日 月 火 水 木 金 土'
 
 cells = ['  '] * start_wday + (1..lastday).map { |d| d.to_s.rjust(2) }
 cells.each_slice(7) { |week| puts week.join(' ') }
+
