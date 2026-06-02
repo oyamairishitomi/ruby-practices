@@ -1,46 +1,33 @@
+#!/usr/bin/env ruby
+
 require 'date'
+require 'optparse'
 
-# ===考え方
-# 日付を取得
-# 月始めまで空白を出力。曜日の日付の前まで
-# 日付出力
-
-# === ★時期設定 
-year = 2026
-month = 5
-# ===
-
-# その月の最初の曜日/最後の日を取得
-firstday = Date.new(year, month, 1)
-lastday = Date.new(year, month, -1).day #数値
-
-title = "#{year}年 #{month}月"
-weekday = " 日  月  火  水  木  金  土" #表示用
-S
-# まず、１行目の空白を作る
-brank = firstday.wday #最初の日付
-
-# ===== 描画
-puts title
-puts weekday
-
-# 空白ループ
-brank.times do
-  print " " + " ".rjust(2," ")+" ";
+def display_width(str)
+  str.each_char.sum { |c| c.bytesize > 1 ? 2 : 1 }
 end
 
-#２行目以降、続く　ループ
-(1..lastday).each do | day |
-  print " " + day.to_s.rjust(2) +" "
-
-  if (Date.new(year,month,day).wday == 6)
-    print "\n"
-  end
+def center_display(str, width)
+  pad = [width - display_width(str), 0].max
+  ' ' * (pad / 2) + str
 end
 
-# 最後の行のあとのスペースうめ
-(6 - Date.new(year,month,lastday).wday).times do
-  print "    "
-end
+options = {}
+OptionParser.new do |opts|
+  opts.on('-m MONTH', Integer) { |m| options[:month] = m }
+  opts.on('-y YEAR', Integer)  { |y| options[:year] = y }
+end.parse!
 
-print "\n"
+today = Date.today
+year  = options[:year]  || today.year
+month = options[:month] || today.month
+
+firstday   = Date.new(year, month, 1)
+lastday    = Date.new(year, month, -1).day
+start_wday = firstday.wday
+
+puts center_display("#{month}月 #{year}年", 20)
+puts '日 月 火 水 木 金 土'
+
+cells = ['  '] * start_wday + (1..lastday).map { |d| d.to_s.rjust(2) }
+cells.each_slice(7) { |week| puts week.join(' ') }
