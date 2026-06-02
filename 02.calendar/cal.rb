@@ -22,13 +22,24 @@ today = Date.today
 year  = options[:year]  || today.year
 month = options[:month] || today.month
 
-firstday   = Date.new(year, month, 1)
-lastday    = Date.new(year, month, -1).day
-start_wday = firstday.wday
+firstday = Date.new(year, month, 1)
+lastday  = Date.new(year, month, -1).day
 
-puts center_display("#{month}月 #{year}年", 20)
-puts '日 月 火 水 木 金 土'
+title   = "#{month}月 #{year}年"
+weekday = '日 月 火 水 木 金 土'
+brank   = firstday.wday
 
-cells = ['  '] * start_wday + (1..lastday).map { |d| d.to_s.rjust(2) }
-cells.each_slice(7) { |week| puts week.join(' ') }
+puts center_display(title, 20)
+puts weekday
 
+brank.times { print '   ' }
+
+(1..lastday).each do |day|
+  if Date.new(year, month, day).wday == 6
+    print day.to_s.rjust(2) + "\n"
+  else
+    print day.to_s.rjust(2) + ' '
+  end
+end
+
+print "\n" unless Date.new(year, month, lastday).wday == 6
