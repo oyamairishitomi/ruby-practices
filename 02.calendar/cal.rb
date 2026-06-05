@@ -9,7 +9,9 @@ end
 
 def center_display(str, width)
   pad = [width - display_width(str), 0].max
-  ' ' * (pad / 2) + str
+  left_pad = pad / 2
+  right_pad = pad - left_pad
+  ' ' * left_pad + str + ' ' * right_pad
 end
 
 options = {}
@@ -25,7 +27,7 @@ month = options[:month] || today.month
 firstday = Date.new(year, month, 1)
 lastday  = Date.new(year, month, -1).day
 
-title   = "#{month}月 #{year}年"
+title   = "#{month}月 #{year}"
 weekday = '日 月 火 水 木 金 土'
 brank   = firstday.wday
 
