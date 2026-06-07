@@ -1,47 +1,33 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 require 'date'
 require 'optparse'
 
-def display_width(str)
-  str.each_char.sum { |c| c.bytesize > 1 ? 2 : 1 }
-end
-
-def center_display(str, width)
-  pad = [width - display_width(str), 0].max
-  left_pad = pad / 2
-  right_pad = pad - left_pad
-  ' ' * left_pad + str + ' ' * right_pad
-end
-
 options = {}
 OptionParser.new do |opts|
   opts.on('-m MONTH', Integer) { |m| options[:month] = m }
-  opts.on('-y YEAR', Integer)  { |y| options[:year] = y }
+  opts.on('-y YEAR', Integer) { |y| options[:year] = y }
 end.parse!
 
 today = Date.today
-year  = options[:year]  || today.year
+year = options[:year] || today.year
 month = options[:month] || today.month
 
-firstday = Date.new(year, month, 1)
-lastday  = Date.new(year, month, -1).day
+first_date = Date.new(year, month, 1)
+last_date = Date.new(year, month, -1)
 
-title   = "#{month}月 #{year}"
-weekday = '日 月 火 水 木 金 土'
-brank   = firstday.wday
+puts "      #{month}月 #{year}"
+puts '日 月 火 水 木 金 土'
+print '   ' * first_date.wday
 
-puts center_display(title, 20)
-puts weekday
-
-brank.times { print '   ' }
-
-(1..lastday).each do |day|
-  if Date.new(year, month, day).wday == 6
-    print day.to_s.rjust(2) + "\n"
+(first_date..last_date).each do |date|
+  formatted_day = date.day.to_s.rjust(2)
+  if date.wday == 6
+    print "#{formatted_day}\n"
   else
-    print day.to_s.rjust(2) + ' '
+    print "#{formatted_day} "
   end
 end
 
-print "\n" unless Date.new(year, month, lastday).wday == 6
+print "\n" unless last_date.wday == 6
