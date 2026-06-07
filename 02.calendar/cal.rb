@@ -22,12 +22,10 @@ puts '日 月 火 水 木 金 土'
 print '   ' * first_date.wday
 
 (first_date..last_date).each do |date|
-  formatted_day = date.day.to_s.rjust(2)
-  if date.wday == 6
-    print "#{formatted_day}\n"
+  day = date.day.to_s.rjust(2)
+  if date.saturday? || date == last_date
+    puts day
   else
-    print "#{formatted_day} "
+    print "#{day} "
   end
 end
-
-print "\n" unless last_date.wday == 6
