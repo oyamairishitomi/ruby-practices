@@ -1,13 +1,16 @@
 # frozen_string_literal: true
 
+MAX_COLUMN_NUMBER = 3
+
 def fetch_files(path)
   Dir.entries(path).reject { |file| file.start_with?('.') }.sort
 end
 
-def display_files(files, max, item_len_max)
-  height = (files.length.to_f / max).ceil
+def display_files(files)
+  item_len_max = files.map(&:length).max
+  height = (files.length.to_f / MAX_COLUMN_NUMBER).ceil
   height.times do |row|
-    max.times do |col|
+    MAX_COLUMN_NUMBER.times do |col|
       item = files[row + col * height]
       print "#{item.to_s.ljust(item_len_max, ' ')}　" if item
     end
@@ -17,7 +20,4 @@ end
 
 path = ARGV[0] || '.'
 files = fetch_files(path)
-file_num = 3
-lengths = files.map(&:length)
-item_len_max = lengths.max
-display_files(files, file_num, item_len_max)
+display_files(files)
