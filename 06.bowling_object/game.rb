@@ -5,7 +5,7 @@ require_relative 'frame'
 
 class Game
   def initialize(score_str)
-    @balls = score_str.split(',').map { |b| b == 'X' ? 10 : b.to_i }
+    @balls = score_str.split(',')
     @shots = @balls.map { |b| Shot.new(b) }
 
     @frames = []
@@ -15,7 +15,7 @@ class Game
         @frames << Frame.new([@shots[i]])
         i += 1
       else
-        @frames << Frame.new([@shots[i], @shots[i + 1]])
+        @frames << Frame.new(@shots[i, 2])
         i += 2
       end
     end
@@ -23,25 +23,9 @@ class Game
   end
 
   def score
-    total = 0
-    @frames.each_with_index do |frame, i|
-      total += frame.score
-      total += bonus(frame, i)
-    end
-    total
-  end
-
-  private
-
-  def bonus(frame, index)
-    if frame.strike? && index < 9
-      bonus_shots = @frames[(index + 1)..].flat_map(&:shots)
-      bonus_shots[0].pins + bonus_shots[1].pins
-    elsif frame.spare? && index < 9
-      bonus_shots = @frames[(index + 1)..].flat_map(&:shots)
-      bonus_shots[0].pins
-    else
-      0
+    @frames.each_with_index.sum do |frame, i|
+      bonus_shots = @frames[(i + 1)..].flat_map(&:shots)
+      frame.score + frame.bonus(bonus_shots)
     end
   end
 end
