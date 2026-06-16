@@ -3,10 +3,7 @@ require 'optparse'
 
 MAX_COLUMN_NUMBER = 3
 
-options = {}
-opt = OptionParser.new
-opt.on('-a'){ |a| options[:all] = a }
-opt.parse!(ARGV)
+options = ARGV.getopts('a')
 
 def fetch_files(path, all)
   if all
@@ -30,5 +27,5 @@ def display_files(files)
 end
 
 path = ARGV[0] || '.'
-files = fetch_files(path, options[:all])
+files = fetch_files(path, options['a'])
 display_files(files)
