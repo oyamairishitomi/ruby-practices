@@ -8,23 +8,19 @@ class Game
     @balls = score_str.split(',')
     @shots = @balls.map { |b| Shot.new(b) }
 
-    @frames = []
     i = 0
-    9.times do
-      if @shots[i].pins == 10
-        @frames << Frame.new([@shots[i]])
-        i += 1
-      else
-        @frames << Frame.new(@shots[i, 2])
-        i += 2
-      end
+    @frames = 9.times.map do
+      count = if @shots[i].pins == 10 then 1 else 2 end
+      frame = Frame.new(@shots[i, count])
+      i += count
+      frame
     end
     @frames << Frame.new(@shots[i..])
   end
 
   def score
     @frames.each_with_index.sum do |frame, i|
-      bonus_shots = @frames[(i + 1)..].flat_map(&:shots)
+      bonus_shots = @frames[(i + 1)..].flat_map(&:shots).first(2)
       frame.score + frame.bonus(bonus_shots)
     end
   end
