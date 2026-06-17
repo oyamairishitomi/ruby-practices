@@ -3,14 +3,12 @@ require 'optparse'
 
 MAX_COLUMN_NUMBER = 3
 
-OPTIONS = ARGV.getopts('r')
-
 def get_files(path)
   Dir.entries(path).reject { |file| file.start_with?('.') }
 end
 
-def fetch_files(path)
-  if OPTIONS['r']
+def fetch_files(path, options)
+  if options['r']
     get_files(path).sort.reverse
   else
     get_files(path).sort
@@ -29,6 +27,7 @@ def display_files(files)
   end
 end
 
+options = ARGV.getopts('r')
 path = ARGV[0] || '.'
-files = fetch_files(path)
+files = fetch_files(path, options)
 display_files(files)
