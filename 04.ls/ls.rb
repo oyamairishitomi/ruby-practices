@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'optparse'
-require 'fileutils'
 require 'etc'
 
 MAX_COLUMN_NUMBER = 3
@@ -11,19 +10,19 @@ def get_files(path)
   Dir.entries(path).reject { |file| file.start_with?('.') }
 end
 
-def type_char(path)
-  filetype = File.stat(path).ftype
-  if filetype == 'directory'
+def type_char(stat)
+  case stat.ftype
+  when 'directory'
     'd'
-  elsif filetype == 'link'
+  when 'link'
     'l'
   else
     '-'
   end
 end
 
-def permission_string(path)
-  digits = File.stat(path).mode.to_s(8)[-3..]
+def permission_string(stat)
+  digits = stat.mode.to_s(8)[-3..]
   digits.each_char.map { |char| PERMISSION_TABLE[char.to_i] }.join
 end
 
@@ -52,18 +51,34 @@ path = ARGV[0] || '.'
 files = fetch_files(path, options)
 
 if options['l']
-  sum = 0
-  files.each do |file|
-    sum += File.stat(File.join(path, file)).blocks
-  end
-  puts "total #{sum / 2}"
-  files.each do |file|
+  file_details = files.map do |file|
     full_path = File.join(path, file)
     stat = File.stat(full_path)
-    owner = Etc.getpwuid(stat.uid).name
-    group = Etc.getgrgid(stat.gid).name
-    mtime = stat.mtime.strftime('%b %e %H:%M')
-    puts "#{type_char(full_path)}#{permission_string(full_path)} #{stat.nlink} #{owner} #{group} #{stat.size} #{mtime} #{file}"
+    {
+      permission: "#{type_char(stat)}#{permission_string(stat)}",
+      nlink: stat.nlink.to_s,
+      owner: Etc.getpwuid(stat.uid).name,
+      group: Etc.getgrgid(stat.gid).name,
+      size: stat.size.to_s,
+      mtime: stat.mtime.strftime('%b %e %H:%M'),
+      name: file,
+      blocks: stat.blocks
+    }
+  end
+
+  puts "total #{file_details.sum { |d| d[:blocks] } / 2}"
+
+  nlink_width = file_details.map { |d| d[:nlink].length }.max
+  owner_width = file_details.map { |d| d[:owner].length }.max
+  group_width = file_details.map { |d| d[:group].length }.max
+  size_width = file_details.map { |d| d[:size].length }.max
+
+  file_details.each do |d|
+    nlink = d[:nlink].rjust(nlink_width)
+    owner = d[:owner].rjust(owner_width)
+    group = d[:group].rjust(group_width)
+    size = d[:size].rjust(size_width)
+    puts "#{d[:permission]} #{nlink} #{owner} #{group} #{size} #{d[:mtime]} #{d[:name]}"
   end
 else
   display_files(files)
