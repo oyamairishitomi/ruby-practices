@@ -5,16 +5,13 @@ require 'etc'
 
 MAX_COLUMN_NUMBER = 3
 PERMISSION_TABLE = ['---', '--x', '-w-', '-wx', 'r--', 'r-x', 'rw-', 'rwx'].freeze
+COLUMN_KEYS = %i[nlink owner group size].freeze
 
-def get_files(path)
-  Dir.entries(path).reject { |file| file.start_with?('.') }
-end
-
-def type_char(stat)
-  case stat.ftype
-  when 'directory' then 'd'
-  when 'link' then 'l'
-  else '-'
+def get_files(path, all)
+  if all
+    Dir.entries(path).sort
+  else
+    Dir.entries(path).reject { |file| file.start_with?('.') }
   end
 end
 
@@ -24,10 +21,16 @@ def permission_string(stat)
 end
 
 def fetch_files(path, options)
-  if options['r']
-    get_files(path).sort.reverse
-  else
-    get_files(path).sort
+  files = get_files(path, options['a'])
+  files = files.sort.reverse if options['r']
+  files
+end
+
+def type_char(stat)
+  case stat.ftype
+  when 'directory' then 'd'
+  when 'link' then 'l'
+  else '-'
   end
 end
 
@@ -43,9 +46,29 @@ def display_files(files)
   end
 end
 
-options = ARGV.getopts('rl')
+options = ARGV.getopts('arl')
 path = ARGV[0] || '.'
 files = fetch_files(path, options)
+
+def column_width(file_details)
+  COLUMN_KEYS.map do |k|
+    file_details.map { |detail| detail[k].length }.max
+  end
+end
+
+def display_file_details(file_details)
+  puts "total #{file_details.sum { |detail| detail[:blocks] } / 2}"
+
+  nlink_width, owner_width, group_width, size_width = column_width(file_details)
+
+  file_details.each do |detail|
+    nlink = detail[:nlink].rjust(nlink_width)
+    owner = detail[:owner].rjust(owner_width)
+    group = detail[:group].rjust(group_width)
+    size = detail[:size].rjust(size_width)
+    puts "#{detail[:permission]} #{nlink} #{owner} #{group} #{size} #{detail[:mtime]} #{detail[:name]}"
+  end
+end
 
 if options['l']
   file_details = files.map do |file|
@@ -62,21 +85,7 @@ if options['l']
       blocks: stat.blocks
     }
   end
-
-  puts "total #{file_details.sum { |d| d[:blocks] } / 2}"
-
-  nlink_width = file_details.map { |d| d[:nlink].length }.max
-  owner_width = file_details.map { |d| d[:owner].length }.max
-  group_width = file_details.map { |d| d[:group].length }.max
-  size_width = file_details.map { |d| d[:size].length }.max
-
-  file_details.each do |d|
-    nlink = d[:nlink].rjust(nlink_width)
-    owner = d[:owner].rjust(owner_width)
-    group = d[:group].rjust(group_width)
-    size = d[:size].rjust(size_width)
-    puts "#{d[:permission]} #{nlink} #{owner} #{group} #{size} #{d[:mtime]} #{d[:name]}"
-  end
+  display_file_details(file_details)
 else
   display_files(files)
 end
