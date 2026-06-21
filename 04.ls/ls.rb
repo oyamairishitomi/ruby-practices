@@ -12,12 +12,9 @@ end
 
 def type_char(stat)
   case stat.ftype
-  when 'directory'
-    'd'
-  when 'link'
-    'l'
-  else
-    '-'
+  when 'directory' then 'd'
+  when 'link' then 'l'
+  else '-'
   end
 end
 
