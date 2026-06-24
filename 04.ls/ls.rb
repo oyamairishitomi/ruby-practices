@@ -11,7 +11,7 @@ def get_files(path, all)
   if all
     Dir.entries(path).sort
   else
-    Dir.entries(path).reject { |file| file.start_with?('.') }
+    Dir.entries(path).sort.reject { |file| file.start_with?('.') }
   end
 end
 
@@ -46,10 +46,6 @@ def display_files(files)
   end
 end
 
-options = ARGV.getopts('arl')
-path = ARGV[0] || '.'
-files = fetch_files(path, options)
-
 def column_width(file_details)
   COLUMN_KEYS.map do |k|
     file_details.map { |detail| detail[k].length }.max
@@ -70,10 +66,14 @@ def display_file_details(file_details)
   end
 end
 
+options = ARGV.getopts('arl')
+path = ARGV[0] || '.'
+files = fetch_files(path, options)
+
 if options['l']
   file_details = files.map do |file|
     full_path = File.join(path, file)
-    stat = File.stat(full_path)
+    stat = File.lstat(full_path)
     {
       permission: "#{type_char(stat)}#{permission_string(stat)}",
       nlink: stat.nlink.to_s,
