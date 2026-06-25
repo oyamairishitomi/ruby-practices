@@ -8,10 +8,12 @@ PERMISSION_TABLE = ['---', '--x', '-w-', '-wx', 'r--', 'r-x', 'rw-', 'rwx'].free
 COLUMN_KEYS = %i[nlink owner group size].freeze
 
 def get_files(path, all)
+  entries = Dir.entries(path).sort
+
   if all
-    Dir.entries(path).sort
+    entries
   else
-    Dir.entries(path).sort.reject { |file| file.start_with?('.') }
+    entries.reject { |file| file.start_with?('.') }
   end
 end
 
@@ -22,7 +24,7 @@ end
 
 def fetch_files(path, options)
   files = get_files(path, options['a'])
-  files = files.sort.reverse if options['r']
+  files = files.reverse if options['r']
   files
 end
 
