@@ -27,7 +27,7 @@ else
   end
 end
 
-max_len = (line_counts + word_counts + byte_sizes).max.to_s.length
+max_len = ([line_counts.sum, word_counts.sum, byte_sizes.sum] + line_counts + word_counts + byte_sizes).max.to_s.length
 options[:max_len] = max_len
 
 def format_counts(line, word, byte, options)
