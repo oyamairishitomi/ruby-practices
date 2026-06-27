@@ -13,13 +13,13 @@ class Printer
     height.times do |row|
       MAX_COLUMN_NUMBER.times do |col|
         item = names[row + col * height]
-        print "#{item.to_s.ljust(item_len_max, ' ')}　" if item
+        print "#{item.to_s.ljust(item_len_max, ' ')} " if item
       end
       puts ''
     end
   end
 
-  def print_in_detail(entry_list, reverse)
+  def print_in_detail(entry_list, reverse:)
     puts "total #{entry_list.total_blocks}"
 
     widths = %i[nlink owner group size].to_h { |attr| [attr, entry_list.max_width(attr)] }

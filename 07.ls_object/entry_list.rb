@@ -16,6 +16,7 @@ class EntryList
   end
 
   def total_blocks
+    # 512バイト単位の値を1024バイト単位に変換するため、1024/512=2で割る
     @entries.sum(&:blocks) / 2
   end
 

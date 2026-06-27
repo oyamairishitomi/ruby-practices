@@ -11,7 +11,7 @@ list = EntryList.new(path, show_hidden: options.a?)
 printer = Printer.new
 
 if options.l?
-  printer.print_in_detail(list, options.r?)
+  printer.print_in_detail(list, reverse: options.r?)
 else
   printer.print_in_column(list.sorted_entries(reverse: options.r?))
 end
