@@ -28,22 +28,22 @@ else
 end
 
 max_len = ([line_counts.sum, word_counts.sum, byte_sizes.sum] + line_counts + word_counts + byte_sizes).max.to_s.length
-options[:max_len] = max_len
 
-def format_counts(line, word, byte, options)
+def format_counts(datam, options, max_len)
+  line, word, byte = datam
   values = []
-  values << line.to_s.rjust(options[:max_len]) if options[:l] || options.except(:max_len).empty?
-  values << word.to_s.rjust(options[:max_len]) if options[:w] || options.except(:max_len).empty?
-  values << byte.to_s.rjust(options[:max_len]) if options[:c] || options.except(:max_len).empty?
+  values << line.to_s.rjust(max_len) if options[:l] || options.empty?
+  values << word.to_s.rjust(max_len) if options[:w] || options.empty?
+  values << byte.to_s.rjust(max_len) if options[:c] || options.empty?
   values.join(' ')
 end
 
 if ARGV.empty?
-  puts format_counts(line_counts[0], word_counts[0], byte_sizes[0], options)
+  puts format_counts([line_counts[0], word_counts[0], byte_sizes[0]], options, max_len)
 else
   ARGV.each_with_index do |file_name, i|
-    puts "#{format_counts(line_counts[i], word_counts[i], byte_sizes[i], options)} #{file_name}"
+    puts "#{format_counts([line_counts[i], word_counts[i], byte_sizes[i]], options, max_len)} #{file_name}"
   end
 end
 
-puts "#{format_counts(line_counts.sum, word_counts.sum, byte_sizes.sum, options)} total" if ARGV.size > 1
+puts "#{format_counts([line_counts.sum, word_counts.sum, byte_sizes.sum], options, max_len)} total" if ARGV.size > 1
