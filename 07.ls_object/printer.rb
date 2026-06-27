@@ -15,7 +15,7 @@ class Printer
         item = names[row + col * height]
         print "#{item.ljust(item_len_max)} " if item
       end
-      puts ''
+      puts
     end
   end
 
