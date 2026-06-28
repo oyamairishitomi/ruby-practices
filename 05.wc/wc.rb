@@ -2,6 +2,17 @@
 
 require 'optparse'
 
+def format_counts(counts, options, max_len)
+  line = counts[:line]
+  word = counts[:word]
+  bytes = counts[:bytes]
+  values = []
+  values << line.to_s.rjust(max_len) if options[:l] || options.empty?
+  values << word.to_s.rjust(max_len) if options[:w] || options.empty?
+  values << bytes.to_s.rjust(max_len) if options[:c] || options.empty?
+  values.join(' ')
+end
+
 options = {}
 OptionParser.new do |opts|
   opts.on('-l') { options[:l] = true }
@@ -24,18 +35,7 @@ end
 
 max_len = (total_counts.values + file_counts.map { |d| d[:line] } + file_counts.map { |d| d[:word] } + file_counts.map { |d| d[:bytes] }).max.to_s.length
 
-def format_counts(counts, options, max_len)
-  line = counts[:line]
-  word = counts[:word]
-  bytes = counts[:bytes]
-  values = []
-  values << line.to_s.rjust(max_len) if options[:l] || options.empty?
-  values << word.to_s.rjust(max_len) if options[:w] || options.empty?
-  values << bytes.to_s.rjust(max_len) if options[:c] || options.empty?
-  values.join(' ')
-end
-
-if ARGV.empty?
+if sources == [nil]
   puts format_counts(file_counts.first, options, max_len)
 else
   sources.each_with_index do |file_name, i|
