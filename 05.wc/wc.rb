@@ -9,41 +9,37 @@ OptionParser.new do |opts|
   opts.on('-c') { options[:c] = true }
 end.parse!(ARGV)
 
-line_counts = []
-word_counts = []
-byte_sizes = []
+file_counts = []
 
 if ARGV.empty?
   content = $stdin.read
-  line_counts << content.lines.count
-  word_counts << content.split.count
-  byte_sizes << content.bytesize
+  file_counts << {line: content.lines.count, word: content.split.count, bytes: content.bytesize }
 else
   ARGV.each do |file_name|
     content = File.read(file_name)
-    line_counts << content.lines.count
-    word_counts << content.split.count
-    byte_sizes << content.bytesize
+    file_counts << {line: content.lines.count, word: content.split.count, bytes: content.bytesize }
   end
 end
 
-max_len = ([line_counts.sum, word_counts.sum, byte_sizes.sum] + line_counts + word_counts + byte_sizes).max.to_s.length
+max_len = [file_counts.map { |d| d[:line] } + file_counts.map { |d| d[:word] } + file_counts.map { |d| d[:bytes] }].max.to_s.length
 
 def format_counts(datam, options, max_len)
-  line, word, byte = datam
+  line = datam[:line]
+  word = datam[:word]
+  bytes = datam[:bytes]
   values = []
   values << line.to_s.rjust(max_len) if options[:l] || options.empty?
   values << word.to_s.rjust(max_len) if options[:w] || options.empty?
-  values << byte.to_s.rjust(max_len) if options[:c] || options.empty?
+  values << bytes.to_s.rjust(max_len) if options[:c] || options.empty?
   values.join(' ')
 end
 
 if ARGV.empty?
-  puts format_counts([line_counts[0], word_counts[0], byte_sizes[0]], options, max_len)
+  puts format_counts(file_counts.first, options, max_len)
 else
   ARGV.each_with_index do |file_name, i|
-    puts "#{format_counts([line_counts[i], word_counts[i], byte_sizes[i]], options, max_len)} #{file_name}"
+    puts "#{format_counts(file_counts[i], options, max_len)} #{file_name}"
   end
 end
 
-puts "#{format_counts([line_counts.sum, word_counts.sum, byte_sizes.sum], options, max_len)} total" if ARGV.size > 1
+puts "#{format_counts({ line: file_counts.sum { |d| d[:line] }, word: file_counts.sum { |d| d[:word] }, bytes: file_counts.sum { |d| d[:bytes] } }, options, max_len)} total" if ARGV.size > 1
