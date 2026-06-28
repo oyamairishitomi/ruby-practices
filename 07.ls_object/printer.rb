@@ -1,12 +1,10 @@
 # frozen_string_literal: true
 
-require_relative 'entry_list'
-
 class Printer
   MAX_COLUMN_NUMBER = 3
 
-  def print_in_column(entries)
-    names = entries.map(&:name)
+  def print_in_column(entry_list, reverse:)
+    names = entry_list.sorted_entries(reverse: reverse).map(&:name)
 
     item_len_max = names.map(&:length).max
     height = (names.length.to_f / MAX_COLUMN_NUMBER).ceil
