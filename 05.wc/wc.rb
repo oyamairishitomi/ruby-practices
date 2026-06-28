@@ -21,7 +21,7 @@ else
   end
 end
 
-max_len = [file_counts.map { |d| d[:line] } + file_counts.map { |d| d[:word] } + file_counts.map { |d| d[:bytes] }].max.to_s.length
+max_len = ([file_counts.sum { |d| d[:line] }, file_counts.sum { |d| d[:word] }, file_counts.sum { |d| d[:bytes] }] + file_counts.map { |d| d[:line] } + file_counts.map { |d| d[:word] } + file_counts.map { |d| d[:bytes] }).max.to_s.length
 
 def format_counts(datam, options, max_len)
   line = datam[:line]
