@@ -33,14 +33,10 @@ total_counts = file_counts.each_with_object({ line: 0, word: 0, bytes: 0 }) do |
   sum[:bytes] += d[:bytes]
 end
 
-max_len = (total_counts.values + file_counts.map { |d| d[:line] } + file_counts.map { |d| d[:word] } + file_counts.map { |d| d[:bytes] }).max.to_s.length
+max_len = (total_counts.values + file_counts.flat_map(&:values)).max.to_s.length
 
-if sources == [nil]
-  puts format_counts(file_counts.first, options, max_len)
-else
-  sources.each_with_index do |file_name, i|
-    puts "#{format_counts(file_counts[i], options, max_len)} #{file_name}"
-  end
+sources.each_with_index do |file_name, i|
+  puts [format_counts(file_counts[i], options, max_len), file_name].compact.join(' ')
 end
 
-puts "#{format_counts(total_counts, options, max_len)} total" if ARGV.size > 1
+puts "#{format_counts(total_counts, options, max_len)} total" if sources.size > 1
