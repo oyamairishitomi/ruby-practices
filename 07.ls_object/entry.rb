@@ -28,7 +28,7 @@ class Entry
   end
 
   def nlink
-    @stat.nlink.to_s
+    @stat.nlink
   end
 
   def owner
@@ -40,11 +40,11 @@ class Entry
   end
 
   def size
-    @stat.size.to_s
+    @stat.size
   end
 
   def mtime
-    @stat.mtime.strftime('%b %e %H:%M')
+    @stat.mtime
   end
 
   def blocks
