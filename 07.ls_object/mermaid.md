@@ -15,10 +15,8 @@ classDiagram
   }
 
   class EntryList {
+    +build_entries(dir_path, show_hidden)
     +sorted_entries(reverse)
-    +total_blocks()
-    +max_width(attr)
-    -dir_path
     -entries
   }
 
@@ -31,10 +29,11 @@ classDiagram
 
   class Printer {
     +print_in_column(entries)
-    +print_in_detail(entry_list, reverse)
+    +max_width(entries, field)
+    +total_blocks(total_entries)
+    +print_in_detail(entries)
   }
 
   EntryList --> Entry : 複数保持
   Printer --> Entry : 利用
-  Printer --> EntryList : 利用
 ```

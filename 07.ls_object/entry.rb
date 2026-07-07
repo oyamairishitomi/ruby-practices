@@ -7,7 +7,7 @@ class Entry
 
   def initialize(path)
     @path = path
-    @stat = File.stat(@path)
+    @stat = File.lstat(@path)
   end
 
   def name
